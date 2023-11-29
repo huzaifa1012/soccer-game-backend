@@ -10,30 +10,54 @@ app.use(bodyParser.json());
 
 ConnectDB();
 
-// const playersCollection = db.collection('playersCollection');
-
 // Schema
 const playerSchema = new mongoose.Schema({
-  name: { type: String, required: false },
+  name: { type: String, required: true },
+  team: { type: String, required: true },
+  appearances: { type: Number, required: false },
+  goals: { type: Number, required: false },
+  assists: { type: Number, required: false },
+  crossAccuracy: { type: Number, required: false },
+  keyPasses: { type: Number, required: false },
+  tackles: { type: Number, required: false },
   score: { type: Number, required: false },
 });
 // Model
-const playerModel = mongoose.model("players", playerSchema);
-const newUser = new playerModel({
-  name: "huzaifahux",
-  score: 100,
-});
 
-app.post("/players", async (req, res) => {
+const playerModel = mongoose.model("players", playerSchema);
+
+app.post("/addPlayer", async (req, res) => {
+  const {
+    name,
+    team,
+    score,
+    appearances,
+    goals,
+    assists,
+    crossAccuracy,
+    keyPasses,
+    tackles,
+  } = req.body;
+  const addPlayer = new playerModel({
+    name,
+    team,
+    score,
+    appearances,
+    goals,
+    assists,
+    crossAccuracy,
+    keyPasses,
+    tackles,
+  });
   try {
-    const playerSaved = await newUser.save();
-    if (playerSaved) {
-      res.send({ message: "player Saved" });
+    const saved = await addPlayer.save();
+    {
+      saved && console.log("player saved");
+      res.send({ message: "player Saved", playerData: req.body });
     }
-    // console.log('User saved:', result.ops[0]);
-    res.send("done");
   } catch (error) {
     console.error("Error saving user:", error);
+    res.send({ error: "something wrong" });
   }
 });
 
